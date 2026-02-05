@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "npx nodemon server.js --ignore public/* --ignore src/*"
+    "dev": "npx nodemon server.js --ignore public/* --ignore storage/*"
   },
   "dependencies": {
     "axios": "^1.6.0",

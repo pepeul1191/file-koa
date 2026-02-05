@@ -1,0 +1,76 @@
+@baseUrl = http://localhost:5010 
+@xAuthAccess = dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+
+##############
+
+POST {{baseUrl}}/api/v1/sign-in
+Content-Type: application/json
+Accept: application/json
+X-Auth-Trigger: {{xAuthAccess}}
+
+{
+  "user": {
+    "username": "pepe",
+    "id": 1
+  },
+  "roles": [
+  {
+    "id": 1,
+    "name": "file-manager",
+    "permissions": [
+      { "id": 1, "name": "permiso 1.1" },
+      { "id": 2, "name": "permiso 1.2" },
+      { "id": 3, "name": "permiso 1.3" }
+    ]
+  }
+]
+}
+##########
+
+POST {{baseUrl}}/api/v1/sign-in
+Content-Type: application/json
+Accept: application/json
+X-Auth-Trigger: {{xAuthAccess}}
+
+{
+  "user": {
+    "username": "pepe",
+    "id": 1
+  },
+  "roles": [
+  {
+    "id": 1,
+    "name": "file-managers",
+    "permissions": [
+      { "id": 1, "name": "permiso 1.1" },
+      { "id": 2, "name": "permiso 1.2" },
+      { "id": 3, "name": "permiso 1.3" }
+    ]
+  }
+]
+}
+
+##############
+
+POST {{baseUrl}}/api/v1/sign-in
+Content-Type: application/json
+Accept: application/json
+X-Auth-Trigger: asdfdsf
+
+{
+  "user": {
+    "username": "pepe",
+    "id": 1
+  },
+  "roles": [
+  {
+    "id": 1,
+    "name": "file-manager",
+    "permissions": [
+      { "id": 1, "name": "permiso 1.1" },
+      { "id": 2, "name": "permiso 1.2" },
+      { "id": 3, "name": "permiso 1.3" }
+    ]
+  }
+]
+}
