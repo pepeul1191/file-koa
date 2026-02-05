@@ -9,10 +9,6 @@ const SECRET_KEY = process.env.JWT_SECRET || 'tu_secreto';
 // application
 router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
   try {
-    console.log('1 +++++++++++++++++++++++++++++++++++')
-    console.log(ctx.request.body)
-    console.log('2 +++++++++++++++++++++++++++++++++++')
-
     const { user, roles } = ctx.request.body;
 
     const fileManagerRole = roles.find(
@@ -60,5 +56,51 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
     };
   }
 });
+
+router.get('/api/v1/token/translate', authTrigger, async (ctx) => {
+  try {
+    const authHeader = ctx.headers.authorization;
+
+    if (!authHeader) {
+      ctx.status = 401;
+      ctx.body = {
+        success: false,
+        message: 'Token no proporcionado',
+      };
+      return;
+    }
+
+    // Quitamos "Bearer "
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+      ctx.status = 401;
+      ctx.body = {
+        success: false,
+        message: 'Formato de token inválido',
+      };
+      return;
+    }
+
+    // 🔐 Verificamos y decodificamos
+    const decoded = jwt.verify(token, SECRET_KEY);
+
+    ctx.status = 200;
+    ctx.body = {
+      success: true,
+      message: 'Token válido',
+      data: decoded, // ← payload del JWT
+    };
+
+  } catch (error) {
+    ctx.status = 401;
+    ctx.body = {
+      success: false,
+      message: 'Token inválido o expirado',
+      error: error.message,
+    };
+  }
+});
+
 
 export default router;
