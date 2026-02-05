@@ -1,0 +1,50 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# dotenv / config local
+.env
+.env.*  # para .env.dev, .env.local, etc.
+
+# Coverage reports
+coverage/
+
+# Build
+dist/
+build/
+
+# Editor configs
+.vscode/
+.idea/
+
+# Optional: SQLite/local DBs
+*.sqlite
+
+# Optional: PM2 logs
+pids/
+*.pid
+*.seed
+
+# Optional: Next.js or Vite (si usas algo moderno)
+.next/
+out/
+
+
+public/fonts
+*.rar
+
+*.pdf
+*.docx
+tmp
+uploads
+sessions
