@@ -186,4 +186,79 @@ router.post('/api/v1/public', async (ctx) => {
   }
 });
 
+router.post('/api/v1/storage', async (ctx) => {
+  try {
+    const { folder } = ctx.request.body;
+    const file = ctx.request.files?.file;
+
+    if (!folder) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'La llave folder es obligatoria',
+        data: null,
+        error: 'FOLDER_REQUIRED'
+      };
+      return;
+    }
+
+    if (!file) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'No se recibió ningún archivo',
+        data: null,
+        error: 'FILE_REQUIRED'
+      };
+      return;
+    }
+
+    // ruta base /storage
+    const storagePath = path.join(__dirname, '../storage');
+    const folderPath = path.join(storagePath, folder);
+
+    // crear folder si no existe
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    // extensión original
+    const originalName = file.originalFilename;
+    const ext = path.extname(originalName);
+
+    // nuevo nombre
+    const newFileName = `${randomFileName(30)}${ext}`;
+    const finalPath = path.join(folderPath, newFileName);
+
+    // mover archivo
+    await pipeline(
+      fs.createReadStream(file.filepath),
+      fs.createWriteStream(finalPath)
+    );
+
+    await fs.promises.unlink(file.filepath);
+
+    ctx.status = 200;
+    ctx.body = {
+      success: true,
+      message: 'Archivo subido correctamente',
+      data: {
+        folder,
+        filename: newFileName
+      },
+      error: null
+    };
+
+  } catch (error) {
+    console.error(error);
+    ctx.status = 500;
+    ctx.body = {
+      success: false,
+      message: 'Error al subir el archivo',
+      data: null,
+      error: error.message
+    };
+  }
+});
+
 export default router;
