@@ -1,8 +1,17 @@
 // configs/routes.js
 import Router from 'koa-router';
 import jwt from 'jsonwebtoken';
-import { requireAuth, authTrigger } from './middlewares.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { pipeline } from 'stream/promises';
 
+import { requireAuth, authTrigger } from './middlewares.js';
+import { randomFileName } from './helpers.js';
+
+// helpers para __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const router = new Router();
 const SECRET_KEY = process.env.JWT_SECRET || 'tu_secreto';
 
@@ -102,5 +111,79 @@ router.get('/api/v1/token/translate', authTrigger, async (ctx) => {
   }
 });
 
+router.post('/api/v1/public', async (ctx) => {
+  try {
+    const { folder } = ctx.request.body;
+    const file = ctx.request.files?.file;
+
+    if (!folder) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'La llave folder es obligatoria',
+        data: null,
+        error: 'FOLDER_REQUIRED'
+      };
+      return;
+    }
+
+    if (!file) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'No se recibió ningún archivo',
+        data: null,
+        error: 'FILE_REQUIRED'
+      };
+      return;
+    }
+
+    // ruta base /public
+    const publicPath = path.join(__dirname, '../public');
+    const folderPath = path.join(publicPath, folder);
+
+    // crear folder si no existe
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    // extensión original
+    const originalName = file.originalFilename;
+    const ext = path.extname(originalName);
+
+    // nuevo nombre
+    const newFileName = `${randomFileName(30)}${ext}`;
+    const finalPath = path.join(folderPath, newFileName);
+
+    // mover archivo
+    await pipeline(
+      fs.createReadStream(file.filepath),
+      fs.createWriteStream(finalPath)
+    );
+
+    await fs.promises.unlink(file.filepath);
+
+    ctx.status = 200;
+    ctx.body = {
+      success: true,
+      message: 'Archivo subido correctamente',
+      data: {
+        folder,
+        filename: newFileName
+      },
+      error: null
+    };
+
+  } catch (error) {
+    console.error(error);
+    ctx.status = 500;
+    ctx.body = {
+      success: false,
+      message: 'Error al subir el archivo',
+      data: null,
+      error: error.message
+    };
+  }
+});
 
 export default router;

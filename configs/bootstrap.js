@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 
 import morgan from 'koa-morgan';
 import bodyParser from 'koa-bodyparser';
+import koaBody from 'koa-body';
 import serve from 'koa-static';
 
 import appRoutes from './routes.js';
@@ -33,7 +34,7 @@ export default async function bootstrap(app) {
   /* ======================
      Body parsers
   ====================== */
-  app.use(bodyParser());
+  //app.use(bodyParser());
 
   /* ======================
      Archivos estáticos
@@ -41,6 +42,16 @@ export default async function bootstrap(app) {
   app.use(serve(
     path.join(__dirname, '../public')
   ));
+
+  /* ======================
+     Body multipart (files)
+  ====================== */
+  app.use(koaBody({
+    multipart: true,
+    formidable: {
+      keepExtensions: true,
+    }
+  }));
 
   /* ======================
      Variables globales

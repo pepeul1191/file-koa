@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:5010 
 @xAuthAccess = dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
-@jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoicGVwZSIsImlkIjoxfSwicGVybWlzc2lvbnMiOlt7ImlkIjoxLCJuYW1lIjoicGVybWlzbyAxLjEifSx7ImlkIjoyLCJuYW1lIjoicGVybWlzbyAxLjIifSx7ImlkIjozLCJuYW1lIjoicGVybWlzbyAxLjMifV0sImlhdCI6MTc3MDMzMDg2NCwiZXhwIjoxNzcwMzM0NDY0fQ.zwFY2kIkIfyAKTw8L_DSpL0d98loDzqG3G5fGcwPRrc
+@jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoicGVwZSIsImlkIjoxfSwicGVybWlzc2lvbnMiOlt7ImlkIjoxLCJuYW1lIjoicGVybWlzbyAxLjEifSx7ImlkIjoyLCJuYW1lIjoicGVybWlzbyAxLjIifSx7ImlkIjozLCJuYW1lIjoicGVybWlzbyAxLjMifV0sImlhdCI6MTc3MDQxNDEyMSwiZXhwIjoxNzcwNDE3NzIxfQ.LYfuP-KkA7J8Wd0gutz-b_3djyg2T03bVKiMbnnlJYI
 
 ##############
 
@@ -76,8 +76,3 @@ X-Auth-Trigger: asdfdsf
 ]
 }
 
-##############
-GET {{baseUrl}}/api/v1/token/translate
-Accept: application/json
-X-Auth-Trigger: {{xAuthAccess}}
-Authorization: Bearer {{jwt}}
