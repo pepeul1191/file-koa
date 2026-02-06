@@ -261,4 +261,77 @@ router.post('/api/v1/storage', async (ctx) => {
   }
 });
 
+router.get('/api/v1/storage', async (ctx) => {
+  try {
+    const { folder, file, filename } = ctx.query;
+
+    if (!folder || !file) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'folder y file son obligatorios',
+        data: null,
+        error: 'PARAMS_REQUIRED'
+      };
+      return;
+    }
+
+    // 🔒 evitar path traversal
+    if (folder.includes('..') || file.includes('..') || (filename && filename.includes('..'))) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'Ruta inválida',
+        error: 'INVALID_PATH'
+      };
+      return;
+    }
+
+    const storagePath = path.join(__dirname, '../storage');
+    const filePath = path.join(storagePath, folder, file);
+
+    // validar existencia
+    if (!fs.existsSync(filePath)) {
+      ctx.status = 404;
+      ctx.body = {
+        success: false,
+        message: 'Archivo no encontrado',
+        data: null,
+        error: 'FILE_NOT_FOUND'
+      };
+      return;
+    }
+
+    // Obtener la extensión del archivo original
+    const originalExt = path.extname(file);
+    
+    // Construir el nombre de descarga
+    let downloadFileName;
+    if (filename) {
+      // Si filename tiene ya extensión, usarlo tal cual
+      // Si no tiene extensión, agregar la del archivo original
+      const filenameExt = path.extname(filename);
+      downloadFileName = filenameExt ? filename : `${filename}${originalExt}`;
+    } else {
+      downloadFileName = file;
+    }
+    
+    // headers de descarga
+    ctx.set('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
+    ctx.set('Content-Type', 'application/octet-stream');
+
+    ctx.body = fs.createReadStream(filePath);
+
+  } catch (error) {
+    console.error(error);
+    ctx.status = 500;
+    ctx.body = {
+      success: false,
+      message: 'Error al descargar el archivo',
+      data: null,
+      error: error.message
+    };
+  }
+});
+
 export default router;

@@ -76,3 +76,8 @@ X-Auth-Trigger: asdfdsf
 ]
 }
 
+##############
+GET {{baseUrl}}/api/v1/token/translate
+Accept: application/json
+X-Auth-Trigger: {{xAuthAccess}}
+Authorization: Bearer {{jwt}}
