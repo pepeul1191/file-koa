@@ -20,10 +20,12 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
   try {
     const { user, roles } = ctx.request.body;
 
-    const fileManagerRole = roles.find(
-      role => role.name === 'file-manager'
+    const fileManagerRole = roles.find(role =>
+      role.permissions?.some(
+        perm => perm.name?.toLowerCase() === 'file-manager'
+      )
     );
-
+  
     // ❌ Si no existe el rol → error
     if (!fileManagerRole) {
       ctx.status = 403;
@@ -35,7 +37,6 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
       };
       return;
     }
-
     const permissions = fileManagerRole.permissions;
 
     const token = jwt.sign(
@@ -55,7 +56,7 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
     };
 
   } catch (error) {
-    console.error(error);
+    console.error(error.stack);
     ctx.status = error.status || 500;
     ctx.body = {
       success: false,
