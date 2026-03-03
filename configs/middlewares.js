@@ -41,17 +41,25 @@ export const headers = async (ctx, next) => {
   ctx.set('X-Powered-By', 'Koa'); // Agregar una cabecera personalizada
   ctx.set('Server', 'Ubuntu'); // Identificar el servidor
 
-  // Permitir CORS
-  /*
-  ctx.set('Access-Control-Allow-Origin', '*'); // Permitir todas las origenes; ajusta según tus necesidades
-  ctx.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Métodos permitidos
-  ctx.set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Encabezados permitidos
+  // Permitir CORS (la variable CORS_ORIGIN puede ser '*' o lista separada por comas)
+  const raw = process.env.CORS_ORIGIN || '*';
+  const allowed = raw.split(',').map(s => s.trim()).filter(Boolean);
+  const requestOrigin = ctx.get('Origin');
 
-  // Manejo de OPTIONS
+  if (allowed.includes('*')) {
+    ctx.set('Access-Control-Allow-Origin', '*');
+  } else if (requestOrigin && allowed.includes(requestOrigin)) {
+    ctx.set('Access-Control-Allow-Origin', requestOrigin);
+  }
+
+  ctx.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  ctx.set('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+  // Responder preflight automáticamente
   if (ctx.method === 'OPTIONS') {
-    ctx.status = 204; // No content
+    ctx.status = 204;
     return;
-  }*/
+  }
 
   await next(); // Continuar con la siguiente función middleware o ruta
 };

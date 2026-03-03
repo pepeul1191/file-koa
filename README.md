@@ -23,5 +23,6 @@ Contenido del archivo .env
     DEFAULT_PASSWORD=123
     AUTH_HEADER=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
     CRYPTO=mi_clave_secreta_super_larga_123!@#
+    CORS_ORIGIN=http://localhost:3000,http://localhost:4000 o *
 
 ## Estructura del proyecto
