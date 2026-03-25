@@ -8,7 +8,8 @@ import {
 import { 
   uploadPublic, 
   uploadStorage, 
-  downloadStorage 
+  downloadStorage,
+  deleteStorage  // Nuevo método para eliminar
 } from '../controllers/file_controller.js';
 import {
   createFolder,
@@ -33,6 +34,7 @@ router.get('/api/v1/token/translate', authTrigger, translateToken);
 router.post('/api/v1/public', uploadPublic);
 router.post('/api/v1/storage', uploadStorage);
 router.get('/api/v1/storage', downloadStorage);
+router.delete('/api/v1/storage', deleteStorage);  // Nuevo endpoint para eliminar
 
 // Folder routes
 router.post('/api/v1/folder', createFolder);
