@@ -1,0 +1,403 @@
+@baseUrl = http://localhost:5010
+@xAuthAccess = dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+@jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoicGVwZSIsImlkIjoxfSwicGVybWlzc2lvbnMiOlt7ImlkIjoxLCJuYW1lIjoicGVybWlzbyAxLjEifSx7ImlkIjoyLCJuYW1lIjoicGVybWlzbyAxLjIifSx7ImlkIjozLCJuYW1lIjoicGVybWlzbyAxLjMifV0sImlhdCI6MTc3NDQ2NjI5MCwiZXhwIjoxNzc0NDY5ODkwfQ.UonGlBE2tVD2o-3zMuiOm9iVQWdvSXIAq6IQZ85EDTY
+
+### ============================================
+### PRUEBAS PARA ENDPOINTS DE CARPETAS
+### ============================================
+
+### 1. CREAR CARPETA EN RAÍZ (STORAGE)
+# @name createFolderStorage
+POST {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-test",
+  "destination": "storage"
+}
+
+### 2. CREAR CARPETA EN RAÍZ (PUBLIC)
+# @name createFolderPublic
+POST {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-public-test",
+  "destination": "public"
+}
+
+### 3. INTENTAR CREAR CARPETA QUE YA EXISTE (DEBERÍA FALLAR)
+POST {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-test",
+  "destination": "storage"
+}
+
+### 4. CREAR SUBCARPETAS ANIDADAS (STORAGE)
+# @name createNestedFolders
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "mi-carpeta-test/2024/documentos/facturas",
+  "destination": "storage"
+}
+
+### 5. CREAR SUBCARPETAS ANIDADAS (PUBLIC)
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "mi-carpeta-public-test/imagenes/2024/verano",
+  "destination": "public"
+}
+
+### 6. CREAR OTRA ESTRUCTURA ANIDADA
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "cursos/2024/matematicas/recursos/videos",
+  "destination": "storage"
+}
+
+### 7. CREAR CARPETA CON PATH TRAVEL (DEBERÍA FALLAR)
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "../malicioso/test",
+  "destination": "storage"
+}
+
+### 8. CREAR CARPETA CON CARACTERES INVÁLIDOS (DEBERÍA FALLAR)
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "test/../malicioso",
+  "destination": "storage"
+}
+
+### ============================================
+### LISTAR CARPETAS
+### ============================================
+
+### 9. LISTAR CARPETA RAÍZ (STORAGE)
+GET {{baseUrl}}/api/v1/folder/list?destination=storage
+Authorization: Bearer {{jwt}}
+
+### 10. LISTAR CARPETA RAÍZ (PUBLIC)
+GET {{baseUrl}}/api/v1/folder/list?destination=public
+Authorization: Bearer {{jwt}}
+
+### 11. LISTAR CARPETA ESPECÍFICA (STORAGE)
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=mi-carpeta-test
+Authorization: Bearer {{jwt}}
+
+### 12. LISTAR CARPETA ANIDADA
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=mi-carpeta-test/2024
+Authorization: Bearer {{jwt}}
+
+### 13. LISTAR CARPETA PROFUNDA
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=cursos/2024/matematicas/recursos
+Authorization: Bearer {{jwt}}
+
+### 14. LISTAR CARPETA QUE NO EXISTE (DEBERÍA FALLAR)
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=carpeta-que-no-existe
+Authorization: Bearer {{jwt}}
+
+### ============================================
+### RENOMBRAR CARPETAS
+### ============================================
+
+### 15. RENOMBRAR CARPETA EN RAÍZ (STORAGE)
+PUT {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "oldName": "mi-carpeta-test",
+  "newName": "mi-carpeta-renombrada",
+  "destination": "storage"
+}
+
+### 16. RENOMBRAR CARPETA ANIDADA
+PUT {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "mi-carpeta-renombrada/2024/documentos/facturas",
+  "newName": "facturas-2024",
+  "destination": "storage"
+}
+
+### 17. RENOMBRAR SUBCARPETA MÁS PROFUNDA
+PUT {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "cursos/2024/matematicas/recursos/videos",
+  "newName": "contenido-multimedia",
+  "destination": "storage"
+}
+
+### 18. INTENTAR RENOMBRAR CARPETA QUE NO EXISTE (DEBERÍA FALLAR)
+PUT {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "oldName": "carpeta-no-existe",
+  "newName": "nuevo-nombre",
+  "destination": "storage"
+}
+
+### 19. INTENTAR RENOMBRAR CON NOMBRE YA EXISTENTE (DEBERÍA FALLAR)
+PUT {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "oldName": "mi-carpeta-renombrada",
+  "newName": "mi-carpeta-public-test",
+  "destination": "storage"
+}
+
+### ============================================
+### VERIFICAR CAMBIOS DESPUÉS DE RENOMBRAR
+### ============================================
+
+### 20. LISTAR DESPUÉS DE RENOMBRAR
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=mi-carpeta-renombrada
+Authorization: Bearer {{jwt}}
+
+### 21. LISTAR SUBCARPETA RENOMBRADA
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=mi-carpeta-renombrada/2024/documentos
+Authorization: Bearer {{jwt}}
+
+### ============================================
+### ELIMINAR CARPETAS (DEBEN ESTAR VACÍAS)
+### ============================================
+
+### 22. ELIMINAR CARPETA VACÍA EN STORAGE
+DELETE {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-public-test",
+  "destination": "storage"
+}
+
+### 23. ELIMINAR SUBCARPETA (DEBE ESTAR VACÍA)
+DELETE {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "mi-carpeta-renombrada/2024/documentos/facturas-2024",
+  "destination": "storage"
+}
+
+### 24. INTENTAR ELIMINAR CARPETA CON CONTENIDO (DEBERÍA FALLAR)
+DELETE {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-renombrada",
+  "destination": "storage"
+}
+
+### 25. ELIMINAR CARPETA VACÍA EN PUBLIC
+DELETE {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-public-test",
+  "destination": "public"
+}
+
+### 26. ELIMINAR SUBCARPETA ANIDADA VACÍA
+DELETE {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "cursos/2024/matematicas/recursos/contenido-multimedia",
+  "destination": "storage"
+}
+
+### 27. ELIMINAR CARPETA QUE NO EXISTE (DEBERÍA FALLAR)
+DELETE {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "carpeta-no-existe",
+  "destination": "storage"
+}
+
+### ============================================
+### PRUEBAS CON DESTINO PUBLIC
+### ============================================
+
+### 28. CREAR ESTRUCTURA EN PUBLIC
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "galeria/2024/eventos/cumpleanos",
+  "destination": "public"
+}
+
+### 29. LISTAR ESTRUCTURA EN PUBLIC
+GET {{baseUrl}}/api/v1/folder/list?destination=public&path=galeria
+Authorization: Bearer {{jwt}}
+
+### 30. RENOMBRAR CARPETA EN PUBLIC
+PUT {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "galeria/2024/eventos/cumpleanos",
+  "newName": "fiesta-sorpresa",
+  "destination": "public"
+}
+
+### 31. LISTAR DESPUÉS DE RENOMBRAR EN PUBLIC
+GET {{baseUrl}}/api/v1/folder/list?destination=public&path=galeria/2024/eventos
+Authorization: Bearer {{jwt}}
+
+### 32. ELIMINAR CARPETA EN PUBLIC (VACÍA)
+DELETE {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "path": "galeria/2024/eventos/fiesta-sorpresa",
+  "destination": "public"
+}
+
+### ============================================
+### PRUEBAS COMBINADAS CON ARCHIVOS
+### ============================================
+
+### 33. SUBIR ARCHIVO A CARPETA CREADA
+POST {{baseUrl}}/api/v1/storage
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="folder"
+
+mi-carpeta-renombrada
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="video.mp4"
+Content-Type: video/mp4
+
+< ./docs/mocks/video.mp4
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 34. VERIFICAR QUE LA CARPETA YA NO ESTÁ VACÍA (AHORA CONTIENE ARCHIVO)
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=mi-carpeta-renombrada
+Authorization: Bearer {{jwt}}
+
+### 35. INTENTAR ELIMINAR CARPETA CON ARCHIVOS (DEBERÍA FALLAR)
+DELETE {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "mi-carpeta-renombrada",
+  "destination": "storage"
+}
+
+### 36. DESCARGAR ARCHIVO DE LA CARPETA
+GET {{baseUrl}}/api/v1/storage?folder=mi-carpeta-renombrada&file=GNBLMM9cyIDmo4IF7Xpxe8gCEDAYGt.mp4&filename=mi-video
+Authorization: Bearer {{jwt}}
+
+### 37. ELIMINAR ARCHIVO PRIMERO (OPCIONAL - SI TIENES ENDPOINT)
+### NOTA: Necesitarías un endpoint de eliminación de archivos
+
+### ============================================
+### PRUEBAS DE ERRORES
+### ============================================
+
+### 38. CREAR CARPETA SIN DESTINO (DEBERÍA FALLAR)
+POST {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "test-sin-destino"
+}
+
+### 39. CREAR CARPETA CON DESTINO INVÁLIDO (DEBERÍA FALLAR)
+POST {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "name": "test",
+  "destination": "invalido"
+}
+
+### 40. CREAR SUBCARPETA SIN PATH (DEBERÍA FALLAR)
+POST {{baseUrl}}/api/v1/sub-folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "destination": "storage"
+}
+
+### 41. RENOMBRAR SIN PARÁMETROS (DEBERÍA FALLAR)
+PUT {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "destination": "storage"
+}
+
+### 42. ELIMINAR SIN PARÁMETROS (DEBERÍA FALLAR)
+DELETE {{baseUrl}}/api/v1/folder
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "destination": "storage"
+}
+
+### 43. LISTAR SIN DESTINO (DEBERÍA FALLAR)
+GET {{baseUrl}}/api/v1/folder/list
+Authorization: Bearer {{jwt}}
+
+### 44. LISTAR CON PATH TRAVEL (DEBERÍA FALLAR)
+GET {{baseUrl}}/api/v1/folder/list?destination=storage&path=../etc/passwd
+Authorization: Bearer {{jwt}}
+
+### ============================================
+### LIMPIEZA FINAL (OPCIONAL)
+### ============================================
+
+### 45. ELIMINAR ARCHIVO (SI TIENES ENDPOINT)
+### 46. ELIMINAR CARPETAS RESTANTES
+### NOTA: Ejecutar después de limpiar los archivos
