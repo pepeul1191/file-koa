@@ -55,7 +55,7 @@ Authorization: Bearer {{jwt}}
 Content-Type: application/json
 
 {
-  "path": "mi-carpeta-public-test/imagenes/2024/verano",
+  "path": "mi-carpeta-public-test/imagenes/2024/veranos",
   "destination": "public"
 }
 
@@ -208,7 +208,7 @@ Authorization: Bearer {{jwt}}
 Content-Type: application/json
 
 {
-  "path": "mi-carpeta-renombrada/2024/documentos/facturas-2024",
+  "path": "storage/courses/1-",
   "destination": "storage"
 }
 
