@@ -20,10 +20,10 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
   try {
     const { user, roles } = ctx.request.body;
 
-    const fileManagerRole = roles.find(role =>
-      role.permissions?.some(
-        perm => perm.name?.toLowerCase() === 'file-manager'
-      )
+    console.log(roles);
+
+    const fileManagerRole = roles.some(
+      role => role.name?.toLowerCase() === 'file-manager'
     );
   
     // ❌ Si no existe el rol → error

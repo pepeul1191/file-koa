@@ -8,7 +8,7 @@ const app = new Koa();
 await bootstrap(app);
 
 // Levanta el servidor
-const PORT = process.env.PORT || 5010;
+const PORT = process.env.FILES_PORT || 5010;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

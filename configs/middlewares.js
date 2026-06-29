@@ -41,27 +41,34 @@ export const headers = async (ctx, next) => {
   ctx.set('X-Powered-By', 'Koa'); // Agregar una cabecera personalizada
   ctx.set('Server', 'Ubuntu'); // Identificar el servidor
 
-  // Permitir CORS (la variable CORS_ORIGIN puede ser '*' o lista separada por comas)
   const raw = process.env.CORS_ORIGIN || '*';
-  const allowed = raw.split(',').map(s => s.trim()).filter(Boolean);
-  const requestOrigin = ctx.get('Origin');
 
+  const allowed = raw
+    .split(',')
+    .map(o => o.trim())
+    .filter(Boolean);
+
+  const origin = ctx.get('Origin');
+
+  // 🔥 SIEMPRE setear antes de todo
   if (allowed.includes('*')) {
     ctx.set('Access-Control-Allow-Origin', '*');
-  } else if (requestOrigin && allowed.includes(requestOrigin)) {
-    ctx.set('Access-Control-Allow-Origin', requestOrigin);
+  } else if (origin && allowed.includes(origin)) {
+    ctx.set('Access-Control-Allow-Origin', origin);
+    ctx.set('Vary', 'Origin');
   }
 
   ctx.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  ctx.set('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  ctx.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  ctx.set('Access-Control-Allow-Credentials', 'true');
 
-  // Responder preflight automáticamente
+  // 🔥 PREFLIGHT
   if (ctx.method === 'OPTIONS') {
     ctx.status = 204;
-    return;
+    return; // NO next()
   }
 
-  await next(); // Continuar con la siguiente función middleware o ruta
+  await next();
 };
 
 export const authTrigger = async (ctx, next) => {
