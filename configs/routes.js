@@ -18,15 +18,42 @@ const SECRET_KEY = process.env.JWT_SECRET || 'tu_secreto';
 // application
 router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
   try {
-    const { user, roles } = ctx.request.body;
+    const body = ctx.request.body || {};
+    const { user, roles } = body;
 
-    console.log(roles);
+    console.log(user)
+    console.log(roles)
 
-    const fileManagerRole = roles.some(
-      role => role.name?.toLowerCase() === 'file-manager'
+    // Validar usuario
+    if (!user) {
+      ctx.status = 400;
+      ctx.body = {
+        success: false,
+        message: 'El usuario es requerido',
+        data: null,
+        error: 'USER_REQUIRED'
+      };
+      return;
+    }
+
+    // Validar roles
+    if (!Array.isArray(roles) || roles.length === 0) {
+      ctx.status = 403;
+      ctx.body = {
+        success: false,
+        message: 'El usuario no tiene roles asignados',
+        data: null,
+        error: 'ROLES_NOT_FOUND'
+      };
+      return;
+    }
+
+    // Buscar el objeto del rol, no solo un booleano
+    const fileManagerRole = roles.find(
+      role => role?.name?.toLowerCase() === 'file-manager'
     );
-  
-    // ❌ Si no existe el rol → error
+
+    // Si no existe el rol
     if (!fileManagerRole) {
       ctx.status = 403;
       ctx.body = {
@@ -37,7 +64,8 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
       };
       return;
     }
-    const permissions = fileManagerRole.permissions;
+
+    const permissions = fileManagerRole.permissions || [];
 
     const token = jwt.sign(
       {
@@ -57,6 +85,7 @@ router.post('/api/v1/sign-in', authTrigger, async (ctx) => {
 
   } catch (error) {
     console.error(error.stack);
+
     ctx.status = error.status || 500;
     ctx.body = {
       success: false,
@@ -305,7 +334,7 @@ router.get('/api/v1/storage', async (ctx) => {
 
     // Obtener la extensión del archivo original
     const originalExt = path.extname(file);
-    
+
     // Construir el nombre de descarga
     let downloadFileName;
     if (filename) {
@@ -316,7 +345,9 @@ router.get('/api/v1/storage', async (ctx) => {
     } else {
       downloadFileName = file;
     }
-    
+
+    console.log(downloadFileName)
+
     // headers de descarga
     ctx.set('Content-Disposition', `attachment; filename="${encodeURIComponent(downloadFileName)}"`);
     ctx.set('Content-Type', 'application/octet-stream');
